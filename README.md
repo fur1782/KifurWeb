@@ -1,54 +1,53 @@
-# KifurWeb
+﻿# Kifur Web
 
-This template should help get you started developing with Vue 3 in Vite.
+Client web en Vue 3 per a la plataforma de qüestionaris **Kifur**. Consumeix l'API Node/Socket.IO (veure repositori kifur) per gestionar quizzes, iniciar partides i permetre que l'alumnat respongui en temps real.
 
-## Recommended IDE Setup
+## Requisits
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Node.js ≥ 18
+- API de Kifur en funcionament (
+  pm run dev dins del repositori del backend)
 
-## Recommended Browser Setup
+## Instal·lació
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+`bash
 npm install
-```
+cp .env.example .env
+`
 
-### Compile and Hot-Reload for Development
+Actualitza les variables d'entorn segons el teu backend:
 
-```sh
-npm run dev
-```
+- VITE_API_BASE_URL: URL base de l'API REST (p. ex. http://localhost:3000)
+- VITE_SOCKET_URL: URL del servidor de sockets
+- VITE_SOCKET_TOKEN: token que coincideixi amb SOCKET_ACCESS_TOKEN del backend
 
-### Type-Check, Compile and Minify for Production
+## Scripts
 
-```sh
-npm run build
-```
+`bash
+npm run dev        # arrenca el client en mode desenvolupament
+npm run build      # genera la versió per producció
+npm run preview    # serveix la build en local
+npm run type-check # comprova els tipus amb vue-tsc
+`
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Arquitectura
 
-```sh
-npm run test:unit
-```
+- src/modules/home — landing actual (no modificada).
+- src/modules/teacher — gestió de quizzes i sala en directe (llistat, inici de sala, monitorització).
+- src/modules/student — formulari d'accés i visualització/resposta de preguntes en temps real.
+- src/api — clients compartits (axios + socket.io-client).
+- src/router — rutes principals (/, /join, /play/:roomId, /create, /session/:roomId).
+- src/assets — estils globals (base del projecte Vite).
 
-### Lint with [ESLint](https://eslint.org/)
+## Flux principal
 
-```sh
-npm run lint
-```
+1. **Professor/a** accedeix a /create, selecciona un quiz i obre una sala. Automàticament es crea el codi i es pot monitoritzar a /session/:roomId.
+2. **Alumnat** entra a /join, introdueix el codi i el seu nom. Quan el professorat inicia el quiz, apareixen les preguntes en temps real i es poden enviar respostes.
+3. Tant professorat com alumnat reben actualitzacions via WebSocket (user-joined, quiz-started, update-puntuation). El client mostra la classificació i el valor de cada pregunta.
+
+## Notes
+
+- No s'ha modificat l'estil del HomeView.vue; les pàgines noves fan servir el seu propi layout.
+- Si canvies el token de sockets al backend, recorda actualitzar VITE_SOCKET_TOKEN i reiniciar el client (
+  pm run dev).
+- El projecte utilitza Pinia per gestionar l'estat de les sessions i mantenir la connexió amb Socket.IO.
