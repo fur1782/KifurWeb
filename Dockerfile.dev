@@ -1,0 +1,20 @@
+# Dockerfile per desenvolupament del Frontend
+FROM node:20-alpine
+
+# Estableix el directori de treball
+WORKDIR /app
+
+# Copia els fitxers de dependències
+COPY package*.json ./
+
+# Instal·la totes les dependències
+RUN npm install
+
+# Copia tot el codi font
+COPY . .
+
+# Exposa el port de Vite
+EXPOSE 5173
+
+# Vite dev server amb host per acceptar connexions externes
+CMD ["npm", "run", "dev", "--", "--host"]
